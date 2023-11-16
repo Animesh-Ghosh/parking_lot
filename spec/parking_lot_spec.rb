@@ -3,7 +3,10 @@ require_relative '../lib/parking_lot'
 RSpec.describe ParkingLot do
   let(:parking_lot) { ParkingLot.new }
   let(:number_of_slots) { 6 }
-  let(:parking_lot_with_slots) { parking_lot.create_parking_lot(number_of_slots) }
+  let(:parking_lot_with_slots) do
+    parking_lot.create_parking_lot(number_of_slots)
+    parking_lot
+  end
 
   describe '#create_parking_lot' do
     context 'called with a valid number' do
@@ -18,6 +21,7 @@ RSpec.describe ParkingLot do
 
     context 'called with anything but a valid number' do
       it 'raises an ArgumentError' do
+        expect { parking_lot.create_parking_lot(0) }.to raise_error(ArgumentError)
         expect { parking_lot.create_parking_lot(-1) }.to raise_error(ArgumentError)
         expect { parking_lot.create_parking_lot(nil) }.to raise_error(ArgumentError)
       end
@@ -63,17 +67,23 @@ RSpec.describe ParkingLot do
       parking_lot_with_slots.park('KA-01-HH-3141', 'Black')
     end
 
+    it 'raises for invalid slot numbers' do
+      expect do
+        parking_lot_with_slots.leave(10)
+      end.to raise_error(ArgumentError)
+    end
+
     context 'when there are used slots' do
       it 'frees up a slot' do
         expect do
           parking_lot_with_slots.leave(4)
         end.to change {
                  parking_lot_with_slots.slots
-               }.from(number_of_slots).to(number_of_slots + 1)
+               }.from(0).to(1)
       end
     end
 
-    context 'when there slots are empty' do
+    context 'when slots are empty' do
       before do
         1.upto(number_of_slots) do |slot_number|
           parking_lot_with_slots.leave(slot_number)
@@ -119,7 +129,7 @@ RSpec.describe ParkingLot do
       parking_lot_with_slots.park('KA-01-HH-2701', 'Blue')
       parking_lot_with_slots.park('KA-01-HH-3141', 'Black')
       parking_lot_with_slots.leave(4)
-      parking_lot_with_slots.park('DL-12-AA-9999', 'White')
+      parking_lot_with_slots.park('KA-01-P-333', 'White')
     end
 
     context 'when cars with specified colour are parked' do
@@ -136,7 +146,7 @@ RSpec.describe ParkingLot do
       let(:colour) { 'Red' }
 
       it 'returns an empty list' do
-        expect(parking_lot_with_slots.registration_numbers_for_cars_with_colour).to eq []
+        expect(parking_lot_with_slots.registration_numbers_for_cars_with_colour(colour)).to eq []
       end
     end
   end
