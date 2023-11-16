@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/parking_lot'
+
+if File.exist? ARGV.first
+  # process file
+else
+  # start interactive CLI
+end
