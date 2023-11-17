@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/parking_lot'
+require_relative '../lib/parking_lot/interfaces/file_interface'
 
-if File.exist? ARGV.first
-  # process file
+if ARGV.first
+  ParkingLot::Interfaces::FileInterface.new(ARGV.first).process
 else
   # start interactive CLI
 end
