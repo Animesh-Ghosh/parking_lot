@@ -1,7 +1,8 @@
+require_relative './spec_helper'
 require_relative '../lib/parking_lot'
 
 RSpec.describe ParkingLot do
-  let(:parking_lot) { ParkingLot.new }
+  let(:parking_lot) { described_class.new }
   let(:number_of_slots) { 6 }
   let(:parking_lot_with_slots) do
     parking_lot.create_parking_lot(number_of_slots)
@@ -9,7 +10,7 @@ RSpec.describe ParkingLot do
   end
 
   describe '#create_parking_lot' do
-    context 'called with a valid number' do
+    context 'when called with a valid number' do
       before do
         parking_lot.create_parking_lot(number_of_slots)
       end
@@ -19,7 +20,7 @@ RSpec.describe ParkingLot do
       end
     end
 
-    context 'called with anything but a valid number' do
+    context 'when called with anything but a valid number' do
       it 'raises an ArgumentError' do
         expect { parking_lot.create_parking_lot(0) }.to raise_error(ArgumentError)
         expect { parking_lot.create_parking_lot(-1) }.to raise_error(ArgumentError)
@@ -33,9 +34,8 @@ RSpec.describe ParkingLot do
       it 'allocates a slot' do
         expect do
           parking_lot_with_slots.park('KA-01-HH-1234', 'White')
-        end.to change {
-                 parking_lot_with_slots.slots
-               }.from(number_of_slots).to(number_of_slots - 1)
+        end.to change(parking_lot_with_slots, :slots).from(number_of_slots)
+                                                     .to(number_of_slots - 1)
       end
     end
 
@@ -52,7 +52,7 @@ RSpec.describe ParkingLot do
       it 'does not allocate a slot' do
         expect do
           parking_lot_with_slots.park('DL-12-AA-9999', 'White')
-        end.not_to(change { parking_lot_with_slots.slots })
+        end.not_to(change(parking_lot_with_slots, :slots))
       end
     end
   end
@@ -77,9 +77,7 @@ RSpec.describe ParkingLot do
       it 'frees up a slot' do
         expect do
           parking_lot_with_slots.leave(4)
-        end.to change {
-                 parking_lot_with_slots.slots
-               }.from(0).to(1)
+        end.to change(parking_lot_with_slots, :slots).from(0).to(1)
       end
     end
 
@@ -93,7 +91,7 @@ RSpec.describe ParkingLot do
       it 'does not free any slots' do
         expect do
           parking_lot_with_slots.leave(4)
-        end.not_to(change { parking_lot_with_slots.slots })
+        end.not_to(change(parking_lot_with_slots, :slots))
       end
     end
   end
@@ -165,6 +163,7 @@ RSpec.describe ParkingLot do
 
     context 'when cars with specified colour are parked' do
       let(:colour) { 'White' }
+
       it 'returns the slot numbers' do
         expect(parking_lot_with_slots.slot_numbers_for_cars_with_colour(colour)).to eq [1, 2, 4]
       end
@@ -172,6 +171,7 @@ RSpec.describe ParkingLot do
 
     context 'when no car with specified colour are parked' do
       let(:colour) { 'Red' }
+
       it 'returns an empty list' do
         expect(parking_lot_with_slots.slot_numbers_for_cars_with_colour(colour)).to eq []
       end

@@ -1,5 +1,5 @@
-class ParkingLot
-  class Car
+class ParkingLot # :nodoc:
+  class Car # :nodoc:
     attr_reader :registration_number, :colour
 
     def initialize(registration_number, colour)
@@ -24,10 +24,11 @@ class ParkingLot
   end
 
   def park(registration_number, colour)
-    slot_index = @slots.find_index { |slot| slot.nil? }
+    slot_index = @slots.find_index(&:nil?)
     return nil if slot_index.nil?
 
     @slots[slot_index] = Car.new(registration_number, colour)
+    slot_index + 1
   end
 
   def leave(slot_number)
