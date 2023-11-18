@@ -189,7 +189,7 @@ RSpec.describe ParkingLot::Interfaces::FileInterface do
             OUTPUT
           end
           let(:cars_not_found_file_interface) do
-            file = double(:file, readlines: cars_not_found_commands.split("\n"))
+            file = instance_double(File, readlines: cars_not_found_commands.split("\n"))
             allow(File).to receive(:open).and_yield(file)
             described_class.new 'file_inputs.txt'
           end

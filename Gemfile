@@ -4,6 +4,9 @@ ruby '3.2.2'
 
 group :development do
   gem 'byebug'
+end
+
+group :test do
   gem 'rspec'
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
