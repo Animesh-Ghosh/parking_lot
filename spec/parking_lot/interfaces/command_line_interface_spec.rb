@@ -22,6 +22,7 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
       exit
     COMMANDS
   end
+  let(:commands_list) { commands.split("\n") }
   let(:parking_lot) do
     parking_lot = instance_double(ParkingLot)
     allow(ParkingLot).to receive(:new).and_return(parking_lot)
@@ -32,46 +33,14 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
   end
 
   # stub stdout temporarily to reduce noise in spec runs
-  # before do
-  #   @stdout = $stdout
-  #   $stdout = File.open(File::NULL, 'w')
-  # end
-
-  # after do
-  #   $stdout = @stdout
-  # end
   before do
-    commands_list = commands.split("\n")
-    allow($stdin).to receive(:gets).and_return(*commands_list)
+    @stdout = $stdout
+    $stdout = File.open(File::NULL, 'w')
+    allow(command_line_interface).to receive(:gets).and_return(*commands_list)
   end
 
-  describe '#continue?' do
-    context 'when any command other than exit is received' do
-      let(:commands) do
-        <<~COMMANDS
-          create_parking_lot 6
-          park KA-01-HH-1234 White
-          leave 4
-          status
-        COMMANDS
-      end
-
-      it 'returns true' do
-        commands_list.each do
-          command_line_interface.process
-          expect(command_line_interface.continue?).to be true
-        end
-      end
-    end
-
-    context 'when exit is received' do
-      it 'returns false' do
-        commands_list.each do
-          command_line_interface.process
-        end
-        expect(command_line_interface.continue?).to be false
-      end
-    end
+  after do
+    $stdout = @stdout
   end
 
   describe '#process' do
@@ -98,11 +67,7 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
       end
 
       it 'raises an error' do
-        expect do
-          commands.split("\n").each do
-            command_line_interface.process
-          end
-        end.to raise_error(NoMethodError)
+        expect { command_line_interface.process }.to raise_error(NoMethodError)
       end
     end
 
@@ -133,14 +98,14 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
       end
 
       it 'does not raise an error' do
-        expect do
-          commands.split("\n").each do
-            command_line_interface.process
-          end
-        end.not_to raise_error
+        expect { command_line_interface.process }.not_to raise_error
       end
 
       it 'dispatches correct methods to ParkingLot' do
+        parking_lot = instance_double(ParkingLot)
+        allow(ParkingLot).to receive(:new).and_return(parking_lot)
+        command_line_interface = described_class.new
+        allow(command_line_interface).to receive(:gets).and_return(*commands_list)
         allow(parking_lot).to receive(:create_parking_lot)
         allow(parking_lot).to receive(:park)
         allow(parking_lot).to receive(:leave)
@@ -168,17 +133,11 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
         expect(parking_lot).to receive(:status)
         expect(parking_lot).to receive(:registration_numbers_for_cars_with_colour).with('White')
         expect(parking_lot).to receive(:slot_number_for_registration_number).with('KA-01-HH-3141')
-        commands.split("\n").each do
-          command_line_interface.process
-        end
+        command_line_interface.process
       end
 
       it 'prints out the correct output' do
-        expect do
-          commands.split("\n").each do
-            command_line_interface.process
-          end
-        end.to output(expected_output).to_stdout
+        expect { command_line_interface.process }.to output(expected_output).to_stdout
       end
 
       context 'when cars of a specified colour are not parked' do
@@ -228,11 +187,7 @@ RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
         end
 
         it 'prints out Not found for registration numbers and slot numbers' do
-          expect do
-            commands.split("\n").each do
-              command_line_interface.process
-            end
-          end.to output(expected_output).to_stdout
+          expect { command_line_interface.process }.to output(expected_output).to_stdout
         end
       end
     end
