@@ -1,16 +1,16 @@
 require_relative '../../spec_helper'
-require_relative '../../../lib/parking_lot/interfaces/command_line_interface'
+require_relative '../../../lib/parking_lot/interfaces/cli'
 
 RSpec::Matchers.define_negated_matcher :not_raise_error, :raise_error
 
-RSpec.describe ParkingLot::Interfaces::CommandLineInterface do
+RSpec.describe ParkingLot::Interfaces::CLI do
   describe '#process' do
     let(:parking_lot) { instance_double(ParkingLot) }
     let(:command_line_interface) { described_class.new }
 
     before do
       allow(ParkingLot).to receive(:new).and_return(parking_lot)
-      # stub gets in CommandLineInterface to return commands as we want
+      # stub gets in CLI to return commands as we want
       allow(command_line_interface).to receive(:gets).and_return(*commands.split("\n"))
     end
 

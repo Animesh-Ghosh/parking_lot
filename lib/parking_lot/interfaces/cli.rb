@@ -2,7 +2,7 @@ require_relative '../../parking_lot'
 
 class ParkingLot
   module Interfaces
-    class CommandLineInterface # :nodoc:
+    class CLI # :nodoc:
       def initialize
         @parking_lot = ParkingLot.new
         @last_command = nil

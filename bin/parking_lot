@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/parking_lot/interfaces/file_interface'
-require_relative '../lib/parking_lot/interfaces/command_line_interface'
+require_relative '../lib/parking_lot/interfaces/cli'
 
 if ARGV.first
   ParkingLot::Interfaces::FileInterface.new(ARGV.first).process
 else
-  ParkingLot::Interfaces::CommandLineInterface.new.process
+  ParkingLot::Interfaces::CLI.new.process
 end
